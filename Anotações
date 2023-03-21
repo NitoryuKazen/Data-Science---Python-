@@ -1,0 +1,22 @@
+L07 (ESPECIFICO PARA IMAGENS E PROCESSAMENTO DE DADOS COM IMAGENS E SEUS PARÂMETRO)
+
+- Reanalisar os flags masks e delta, para aprimorar a ideia por tras deles, e ver se eles vão precisar se manter ainda. 
+-- acho que se usar o std, média e quem sabe tentar colocar uma gaussiana e encontrar algum divisor de cunho estatístico que melhor separe a amostra de 
+valores seria mais interessante. 
+
+
+#######################################################################################
+PHOTUTILS (RELACIONADO AO PROCESSAMENTO 1D DE DADOS)
+
+- Pesquisar propagação de incertezas 
+- reobservar as masks e ver se a mask da banda g é contida na da banda r, se sim usar a da banda r na manipulação da isoimage_g do código iso_coef.py,
+se não, unir as mascaras no Union. 
+
+
+
+#######################################################################################
+ESTATÍSTICA (RELACIONADO A MANIPULAÇÃO DE DADOS E VARIÁVEIS ÚTEIS)
+
+
+
+#######################################################################################
