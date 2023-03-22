@@ -142,9 +142,17 @@ infail=[[] for i in range(5)]
 infoexp=[[] for i in range(5)]
 
 ############################################
-with open('pargal_L07_compact_casjobs.dat','r') as inp1:
+with open('pargal_L07_clean_vcor_2.dat','r') as inp1:
 	ninp1=len(inp1.readlines())
-inp1=open('pargal_L07_compact_casjobs.dat','r')
+inp1=open('pargal_L07_clean_vcor_2.dat','r')
+
+with open('pargal_L07_clean_exp_vcor_2.dat','r') as inp2:
+	ninp2=len(inp2.readlines())
+inp2=open('pargal_L07_clean_exp_vcor_2.dat','r')
+
+with open('/home/andrelpkaipper/Documentos/Projetos/photutils/pre_parser_info_clean_r4.dat','r') as inp3:
+	ninp3=len(inp3.readlines())
+inp3=open('/home/andrelpkaipper/Documentos/Projetos/photutils/pre_parser_info_clean_r4.dat','r')
 
 for ik in range(0,ninp1):
 	ls1=inp1.readline()

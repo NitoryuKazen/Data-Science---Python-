@@ -1,0 +1,40 @@
+#######################################################################
+#SLOPE LOGARTIMICO
+
+objetivo: fazer o slope logaritmico das galáxias 
+razao: nem eu nem o sandro temos
+
+Ler a dissertacao e aplicar a mesma coisa que o log que eu usei, tentar pensar em uma maneira mais inteligente. 
+- tentar obter o ceu das bcgs, ou quem sabe o ceu medio delas, ainda preciso pensar 
+######################################################################
+
+#GRADIENTE DE COR G - R PARA AS GALÁXIAS
+objetivo: testar as cores das estrelas entre as bandas g e r para cada BCG
+
+reason: tentar mostrar a disparidade entre as idades e metalicidades da regiao interna com a externa de cada galaxia, que existe como suspeito, desta 
+maneira iria permitir qualitativamente mostrar as diferenças de idade e metalicidade, como se fosse um gradiente. 
+
+codigo:
+
+- preciso baixar as imagens da banda g
+
+- preciso aplicar o sextractor
+-- criar mascara 
+-- não tem necessidade de se obter um mapa de segmentação
+-- eu preciso levar em conta algum tamanho máximo da bcg, daria para se pensar 
+na forma como eu calculo o tamanho maximo via o photutils que acho que vai ser a melhor saida
+
+-- fazer a subtração das imagens e por fim a estimativa dos valores médios para cada região interna e externa
+--- região interna - bojo - abaixo do valor do slope logaritmico
+--- região externa - envelope - acima do valor do slope logaritmico
+############################################################################
+
+#GRADIENTE DOS COEFICIENTES DE FOURIER PARA CADA REGIÃO INTERNA E EXTERNA
+
+Objetivo: tentar fazer o mesmo corte de fourier para a região interna e externa das galaxias aplicando o valor médio para ver se ha uma diferença estrutural entre as galáxias terem isofotas discy ou boxy
+
+razao: isso vai sugerir a existência ou não de como essas galáxias se formaram com o tempo e quais processos que nela ocorreram para a formação das estruturas presentes nela hoje em dia. 
+
+codigo:
+
+podemos fazer ele junto com o código de se fazer as imagens do photutils.
