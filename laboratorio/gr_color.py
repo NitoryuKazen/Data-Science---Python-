@@ -381,7 +381,7 @@ for ik in range(0,ninp1):
 		
 		area_g=mask.shape[1]+mask.shape[0]
 		area_r=maskr.shape[1]+maskr.shape[0]
-		print area_g,area_r
+		
 		#g<r
 		if area_g <= area_r:
 
@@ -391,29 +391,17 @@ for ik in range(0,ninp1):
 			nmvec=copy.deepcopy(mask)
 			nmvecr=copy.deepcopy(mask_b)
 			
-			for i in range(0,mask.shape[0]):
-				for j in range(0,mask.shape[1]):
+			for i in range(0,mask.shape[0]-20):
+				for j in range(0,mask.shape[1]-20):
 					if (difxc and difyc) < 0:
-						if i == (0 or maskr.shape[0]) or j == (0 or maskr.shape[1]):
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:
-							nmvec[i,j] = maskr[i-difyc,j-difxc]
-							nmvecr[i,j] = maskr_b[i-difyc,j-difxc]
+						nmvec[i,j] = maskr[i-difyc,j-difxc]
+						nmvecr[i,j] = maskr_b[i-difyc,j-difxc]
 					if difxc > 0 and difyc < 0:
-						if i == (0 or maskr.shape[0]) or j == (0 or maskr.shape[1]):
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:
-							nmvec[i,j] = maskr[i+difyc,j-difxc]
-							nmvecr[i,j] = maskr_b[i+difyc,j-difxc]
+						nmvec[i,j] = maskr[i+difyc,j-difxc]
+						nmvecr[i,j] = maskr_b[i+difyc,j-difxc]
 					if difxc < 0 and difyc > 0:
-						if i == (0 or maskr.shape[0]) or j == (0 or maskr.shape[1]):
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:
-							nmvec[i,j] = maskr[i-difyc,j+difxc]
-							nmvecr[i,j] = maskr_b[i-difyc,j+difxc]
+						nmvec[i,j] = maskr[i-difyc,j+difxc]
+						nmvecr[i,j] = maskr_b[i-difyc,j+difxc]
 						
 			pyfits.writeto(cluster+'/bcg_mask_tilt.fits',nmvec,header=header_maskr,clobber=True)
 			pyfits.writeto(cluster+'/bcg_mask_b_tilt.fits',nmvecr,header=header_maskr,clobber=True)
@@ -444,32 +432,18 @@ for ik in range(0,ninp1):
 			nmvec=copy.deepcopy(maskr)
 			nmvecr=copy.deepcopy(maskr_b)
 			
-			for i in range(0,maskr.shape[0]):
-				for j in range(0,maskr.shape[1]):
-					print i,j
+			for i in range(0,maskr.shape[0]-20):
+				for j in range(0,maskr.shape[1]-20):
 					if (difxc and difyc) < 0:
-						if i == (0 or maskr.shape[0]) or j == (0 or maskr.shape[1]):
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:	
-							nmvec[i,j] = mask[i-difyc,j-difxc]
-							nmvecr[i,j] = mask_b[i-difyc,j-difxc]
+						nmvec[i,j] = mask[i-difyc,j-difxc]
+						nmvecr[i,j] = mask_b[i-difyc,j-difxc]
 	
 					if difxc > 0 and difyc < 0:
-						if i == (0 or maskr.shape[0]) or j == (0 or maskr.shape[1]):
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:
-							nmvec[i,j] = mask[i+difyc,j-difxc]
-							nmvecr[i,j] = mask_b[i+difyc,j-difxc]		
+						nmvec[i,j] = mask[i+difyc,j-difxc]
+						nmvecr[i,j] = mask_b[i+difyc,j-difxc]		
 					if difxc < 0 and difyc > 0:
-						#print i,i-difyc,'##',j,j+difxc
-						if i == 0 or i == maskr.shape[0] or j == 0 or j == maskr.shape[1] or [i,j] == [0,0] or [i,j] == [maskr.shape[0],maskr.shape[1]]:
-							nmvec[i,j] = mask[i,j]
-							nmvecr[i,j] = mask_b[i,j]
-						else:
-							nmvec[i,j] = mask[i-difyc,j+difxc]
-							nmvecr[i,j] = mask_b[i-difyc,j+difxc]
+						nmvec[i,j] = mask[i-difyc,j+difxc]
+						nmvecr[i,j] = mask_b[i-difyc,j+difxc]
 
 			pyfits.writeto(cluster+'/bcg_mask_tilt.fits',nmvec,header=header_maskr,clobber=True)
 			pyfits.writeto(cluster+'/bcg_mask_b_tilt.fits',nmvecr,header=header_maskr,clobber=True)
