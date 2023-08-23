@@ -1,0 +1,47 @@
+0 - cluster
+1 - chi2 S
+2 - intensidade efetiva S
+3 - raio efetivo S
+4 - indice de sérsic
+5 - chi2 S+E
+6 - intensidade efetiva bojo S+E
+7 - raio efetivo bojo S+E
+8 - indice de sérsic bojo S+E
+9 - Intensidade efetiva do envelope S+E 
+10 - raio efetivo do envelope S+E
+11 - chi2 S+S
+12 - intensidade efetiva 1 S+S
+13 - raio efetivo 1 S+S
+14 - indice de sersic 1 S+S
+15 - intensidade efetiva 2 S+S
+16 - raio efetivo 2 S+S
+17 - indice de sersic 2 S+S
+18 - ponto do raio de tonry
+19 - media geral a3
+20 - media geral a4
+21 - media geral b3
+22 - media geral b4
+23 - media geral diskness
+24 - slope polyfit fix log 
+25 - coef linear polyfit fix log
+26 - coef quadratico polyfit fix log
+27 - coef linear polyfit fix log
+28 - termo livre polyfit fix log
+29 - slope polyfit fix 
+30 - coef linear polyfit fix
+31 - coef quadratico polyfit fix
+32 - coef linear polyfit fix 
+33 - termo livre polyfit fix 
+34 - slope polyfit free log 
+35 - coef linear polyfit free log
+36 - coef quadratico polyfit free log
+37 - coef linear polyfit free log
+38 - termo livre polyfit free log
+39 - slope polyfit free
+40 - coef linear polyfit free
+41 - coef quadratico polyfit free
+42 - coef linear polyfit free
+43 - termo livre polyfit free
+44 - rff
+45 - eta
+46 - morfologia zhao
