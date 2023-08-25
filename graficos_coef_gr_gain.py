@@ -14,6 +14,7 @@ import photutils.aperture as php
 import numpy.ma as ma
 from astropy.io import fits
 from statsmodels.nonparametric.smoothers_lowess import lowess
+import statsmodels.api as sm
 import warnings
 warnings.filterwarnings("ignore")
 #############################
@@ -225,41 +226,44 @@ def bcgfigs(cluster,bigtemp,tipo):
 	######################################################################################################
 	# FOURIER COEFFICIENTS
 
+	test=sst.iqr(a4)
+	t1,t2=np.percentile(a4,[25,75])
+	print(t1-1.5*test,t2+1.5*test,np.median(a4))
+
+	a41 = a4[(t1-1.5*test < a4) & (a4 < t2+1.5*test)]
+	a41_err = a4_err[(t1-1.5*test < a4) & (a4 < t2+1.5*test)]
+	sma1=sma[(t1-1.5*test < a4) & (a4 < t2+1.5*test)]
+	print(a41,a41_err,len(a41),len(a41_err))
 	fraction=[0.6,0.7,0.8,0.9]
 	linefrac=['-','--','-.',':']
 	fraction_cores=np.linspace(1,0,len(fraction))
-	coefs=[(a3,a3_err,r'$a_3$',0,'a3'),(a4,a4_err,r'$a_4$',1,'a4'),(b3,b3_err,r'$b_3$',2,'b4'),(b4,b4_err,r'$b_4$',3,'b4'),(a4/sma,a4_err,r'$a_4/sma$',4,'diskness')]
+	coefs=[(a41,a41_err,r'$a_4$',1,'a4')]#[(a3,a3_err,r'$a_3$',0,'a3'),(a41,a41_err,r'$a_4$',1,'a4'),(b3,b3_err,r'$b_3$',2,'b3'),(b4,b4_err,r'$b_4$',3,'b4'),(a4/sma,a4_err/sma,r'$a_4/sma$',4,'diskness')]
 	vec_lowess=[[],[],[],[],[]]
 	fration_tuple=[(0.6,0,0),(0.7,0,1),(0.8,1,0),(0.9,1,1)]
-#	linefrac=['-','--','-.',':']
-#	fraction_cores=np.linspace(1,0,len(fraction))
-
 	for coef,coef_err,nomey,j,savename in coefs:
-		
 		plt.figure()
-		plt.errorbar(np.power(sma,0.25),coef,yerr=coef_err,fmt='o',markersize=2,color='k',ecolor='0.8',label='1.0 '+format(vec_med[j],'.2E'))
+		plt.suptitle(cluster+' '+savename,fontsize=10)
+		plt.errorbar(np.power(sma1,0.25),coef,yerr=coef_err,fmt='o',markersize=2,color='k',ecolor='0.8',label='1.0 '+format(vec_med[j],'.2E'))
 		for i in range(len(fraction)):
-			slow=lowess(coef,np.power(sma,0.25),frac=fraction[i])
+			slow=lowess(coef,np.power(sma1,0.25),frac=fraction[i])
 			med_slow=np.average(slow[:,1])
 			vec_lowess[j].append(med_slow)
 			plt.plot(slow[:,0],slow[:,1],linewidth=2,ls=linefrac[i],c=plt.cm.viridis(fraction_cores[i]),label=str(fraction[i])+' '+format(med_slow,'.2E'))
 		plt.ylabel(nomey)
 		plt.xlabel(r'$R^{1/4}$ (arcsec)')
 		plt.legend(title=r'$F-\mu$',fontsize='x-small')
-		if savename == 'diskness':
-			plt.ylim(-abs(np.std(a4))-(np.max(a4)-np.min(a4))/10.,abs(np.std(a4))+(np.max(a4)-np.min(a4))/10.)
-		else:
-			plt.ylim(-abs(np.std(coef))-(np.max(coef)-np.min(coef))/10.,abs(np.std(coef))+(np.max(coef)-np.min(coef))/10.)
+		plt.ylim(np.min(coef)-abs(np.max(coef)-np.min(coef))/10.,np.max(coef)+abs(np.max(coef)-np.min(coef))/10.)
 
-		plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_'+savename+'.png')
+		#plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_'+savename+'.png')
+		plt.savefig('L07_coef_gain/'+tipo+'/'+savename+'/'+cluster+'.png')
 		plt.close()
 		
 
 		fig, axs = plt.subplots(2, 2,sharex=True)
 		plt.subplots_adjust(hspace=0.35, wspace=0.35)
+		plt.suptitle(cluster+' '+savename,fontsize=10)
 		
 		for i in range(len(fration_tuple)):
-#dividir por familia no gráfico(usar o table unifiyer
 			slow=lowess(coef,np.power(sma,0.25),frac=fraction[i])
 			med_slow=np.average(slow[:,1])
 		
@@ -272,16 +276,14 @@ def bcgfigs(cluster,bigtemp,tipo):
 			if i == 2 or i == 3:
 				axs[fration_tuple[i][1],fration_tuple[i][2]].set_xlabel(r'$R^{1/4}$ (arcsec)')
 			
-			if savename == 'diskness':
-				axs[fration_tuple[i][1],fration_tuple[i][2]].set_ylim(-abs(np.std(a4))-(np.max(a4)-np.min(a4))/10.,abs(np.std(a4))+(np.max(a4)-np.min(a4))/10.)
-			else:
-				axs[fration_tuple[i][1],fration_tuple[i][2]].set_ylim(-abs(np.std(coef))-(np.max(coef)-np.min(coef))/10.,abs(np.std(coef))+(np.max(coef)-np.min(coef))/10.)
+			axs[fration_tuple[i][1],fration_tuple[i][2]].set_ylim(np.min(coef[(-2.<coef) & (coef<2.)])-abs(np.max(coef[(-2.<coef) & (coef<2.)])-np.min(coef[(-2.<coef) & (coef<2.)]))/5.,np.max(coef[(-2.<coef) & (coef<2.)])+abs(np.max(coef[(-2.<coef) & (coef<2.)])-np.min(coef[(-2.<coef) & (coef<2.)]))/5.)
 					
 			axs[fration_tuple[i][1],fration_tuple[i][2]].legend(fontsize='xx-small')
 		plt.tight_layout()
-		plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_sub_'+savename+'.png')	
+		plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_sub_'+savename+'.png')
+		plt.savefig('L07_coef_gain/'+tipo+'/'+savename+'/'+cluster+'_sub.png')
 		plt.close()	
-
+		
 	##############################################################################################################################
 	#PLOT DO PERFIL DE SERSIC E SERIC + EXPONENCIAL RESPECTIVAMENTE
 	
@@ -342,7 +344,7 @@ def bcgfigs(cluster,bigtemp,tipo):
 	plt.plot(np.log10(smagr_free),pfreelog2(np.log10(smagr_free)),c='r',linestyle='dashed',label='Quadratic Fit')
 	plt.xlabel(r'$R$ log(arcsec)')
 	plt.ylabel(r'$g-r$ (mag arcsec$^{-2}$)')
-	plt.ylim([np.min(test_gr_free)+(np.max(test_gr_free)-np.min(test_gr_free))/10.,np.max(test_gr_free)-(np.max(test_gr_free)-np.min(test_gr_free))/10.])
+	plt.ylim([np.min(test_gr_free)-(np.max(test_gr_free)-np.min(test_gr_free))/10.,np.max(test_gr_free)+(np.max(test_gr_free)-np.min(test_gr_free))/10.])
 	plt.legend()
 	plt.tight_layout()
 	plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_gr_free_log_polyfit.png')
@@ -353,7 +355,7 @@ def bcgfigs(cluster,bigtemp,tipo):
 	plt.plot(np.log10(smagr_fix),pfixlog2(np.log10(smagr_fix)),c='r',linestyle='dashed',label='Quadratic Fit')
 	plt.xlabel(r'$R$ log(arcsec)')
 	plt.ylabel(r'$g-r$ (mag arcsec$^{-2}$)')
-	plt.ylim([np.min(test_gr_fix)+(np.max(test_gr_fix)-np.min(test_gr_fix))/10.,np.max(test_gr_fix)-(np.max(test_gr_fix)-np.min(test_gr_fix))/10.])
+	plt.ylim([np.min(test_gr_fix)-(np.max(test_gr_fix)-np.min(test_gr_fix))/10.,np.max(test_gr_fix)+(np.max(test_gr_fix)-np.min(test_gr_fix))/10.])
 	plt.legend()
 	plt.tight_layout()
 	plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_gr_fixx_log_polyfit.png')
@@ -366,7 +368,7 @@ def bcgfigs(cluster,bigtemp,tipo):
 	plt.plot(np.power(smagr_free,0.25),pfree2(np.power(smagr_free,0.25)),c='r',linestyle='dashed',label='Quadratic Fit')
 	plt.xlabel(r'$R^{1/4}$ (arcsec)')
 	plt.ylabel(r'$g-r$ (mag arcsec$^{-2}$)')
-	plt.ylim([np.min(test_gr_free)+(np.max(test_gr_free)-np.min(test_gr_free))/10.,np.max(test_gr_free)-(np.max(test_gr_free)-np.min(test_gr_free))/10.])
+	plt.ylim([np.min(test_gr_free)-(np.max(test_gr_free)-np.min(test_gr_free))/10.,np.max(test_gr_free)+(np.max(test_gr_free)-np.min(test_gr_free))/10.])
 	plt.legend()
 	plt.tight_layout()
 	plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_gr_free.png')
@@ -377,7 +379,7 @@ def bcgfigs(cluster,bigtemp,tipo):
 	plt.plot(np.power(smagr_fix,0.25),pfix2(np.power(smagr_fix,0.25)),c='r',linestyle='dashed',label='Quadratic Fit')
 	plt.xlabel(r'$R^{1/4}$ (arcsec)')
 	plt.ylabel(r'$g-r$ (mag arcsec$^{-2}$)')
-	plt.ylim([np.min(test_gr_fix)+(np.max(test_gr_fix)-np.min(test_gr_fix))/10.,np.max(test_gr_fix)-(np.max(test_gr_fix)-np.min(test_gr_fix))/10.])
+	plt.ylim([np.min(test_gr_fix)-(np.max(test_gr_fix)-np.min(test_gr_fix))/10.,np.max(test_gr_fix)+(np.max(test_gr_fix)-np.min(test_gr_fix))/10.])
 	plt.legend()
 	plt.tight_layout()
 	plt.savefig('L07_coef_gain/'+tipo+'/'+cluster+'/'+cluster+'_gr_fixx.png')
@@ -386,18 +388,19 @@ def bcgfigs(cluster,bigtemp,tipo):
 	
 	return vec_med,polyfit_vec
 	
-graph_data=open('graph_stats.dat','w')
-with open('/home/andre/Documents/Projetos/isophotest/iso_geral_values_coef_astro_tipo.dat','r') as inp1:
+#graph_data=open('graph_stats.dat','w')
+with open('/home/andrelpkaipper/Documentos/Projetos/photutils/iso_geral_values_coef_astro_tipo.dat','r') as inp1:
 	ninp1=len(inp1.readlines())
-inp1=open('/home/andre/Documents/Projetos/isophotest/iso_geral_values_coef_astro_tipo.dat','r')
+inp1=open('/home/andrelpkaipper/Documentos/Projetos/photutils/iso_geral_values_coef_astro_tipo.dat','r')
 for ik in range(0,ninp1):
 	ls1=inp1.readline()
 	ll1=ls1.split()	
+	#call('cp -r L07_coef_gain/'+ll1[-1]+'/'+ll1[0]+'/'+ll1[0]+'_sub* L07_coef_gain/'+ll1[-1]+'/',shell=True)
 	coef_comp=bcgfigs(ll1[0],[[float(ll1[11]),float(ll1[14]),float(ll1[15]),float(ll1[16])],[float(ll1[12]),float(ll1[17]),float(ll1[18]),float(ll1[19]),float(ll1[20]),float(ll1[21])],[float(ll1[13]),float(ll1[22]),float(ll1[23]),float(ll1[24]),float(ll1[25]),float(ll1[26]),float(ll1[27])]],ll1[-1])
-
+	break
 	#x=[ll1[0],float(ll1[11]),float(ll1[14]),float(ll1[15]),float(ll1[16]),float(ll1[12]),float(ll1[17]), float(ll1[18]),float(ll1[19]),float(ll1[20]),float(ll1[21]),float(ll1[13]),float(ll1[22]),float(ll1[23]),float(ll1[24]),float(ll1[25]),float(ll1[26]),float(ll1[27]), int(ll1[30]),coef_comp[0][0],coef_comp[0][1],coef_comp[0][2],coef_comp[0][3],coef_comp[0][4],coef_comp[1][0][0],coef_comp[1][0][1],coef_comp[1][1][0],coef_comp[1][1][1],coef_comp[1][1][2],coef_comp[1][2][0],coef_comp[1][2][1],coef_comp[1][3][0],coef_comp[1][3][1],coef_comp[1][3][2],coef_comp[1][4][0],coef_comp[1][4][1],coef_comp[1][5][0],coef_comp[1][5][1],coef_comp[1][5][2],coef_comp[1][6][0],coef_comp[1][6][1],coef_comp[1][7][0],coef_comp[1][7][1],coef_comp[1][7][2]]
 #	print(len(x))
 	
 	
-	graph_data.write('%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %i %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f \n' %(ll1[0],float(ll1[11]),float(ll1[14]),float(ll1[15]),float(ll1[16]),float(ll1[12]), float(ll1[17]),float(ll1[18]),float(ll1[19]),float(ll1[20]),float(ll1[21]),float(ll1[13]),float(ll1[22]),float(ll1[23]),float(ll1[24]),float(ll1[25]),float(ll1[26]),float(ll1[27]), int(ll1[30]),coef_comp[0][0],coef_comp[0][1],coef_comp[0][2],coef_comp[0][3],coef_comp[0][4],coef_comp[1][0][0],coef_comp[1][0][1],coef_comp[1][1][0],coef_comp[1][1][1],coef_comp[1][1][2],coef_comp[1][2][0],coef_comp[1][2][1],coef_comp[1][3][0],coef_comp[1][3][1],coef_comp[1][3][2],coef_comp[1][4][0],coef_comp[1][4][1],coef_comp[1][5][0],coef_comp[1][5][1],coef_comp[1][5][2],coef_comp[1][6][0],coef_comp[1][6][1],coef_comp[1][7][0],coef_comp[1][7][1],coef_comp[1][7][2]))
+#	graph_data.write('%s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %i %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f \n' %(ll1[0],float(ll1[11]),float(ll1[14]),float(ll1[15]),float(ll1[16]),float(ll1[12]), float(ll1[17]),float(ll1[18]),float(ll1[19]),float(ll1[20]),float(ll1[21]),float(ll1[13]),float(ll1[22]),float(ll1[23]),float(ll1[24]),float(ll1[25]),float(ll1[26]),float(ll1[27]), int(ll1[30]),coef_comp[0][0],coef_comp[0][1],coef_comp[0][2],coef_comp[0][3],coef_comp[0][4],coef_comp[1][0][0],coef_comp[1][0][1],coef_comp[1][1][0],coef_comp[1][1][1],coef_comp[1][1][2],coef_comp[1][2][0],coef_comp[1][2][1],coef_comp[1][3][0],coef_comp[1][3][1],coef_comp[1][3][2],coef_comp[1][4][0],coef_comp[1][4][1],coef_comp[1][5][0],coef_comp[1][5][1],coef_comp[1][5][2],coef_comp[1][6][0],coef_comp[1][6][1],coef_comp[1][7][0],coef_comp[1][7][1],coef_comp[1][7][2]))
 ############################################################################################
