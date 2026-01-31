@@ -1,2 +1,2 @@
 # WORK
-Aqui estão os programas usados em meu trabalho de astrofisica, o qual um dia será liberado para uso geral, mas no momento manterei no privado. 
+On this project are some pipelines made for data science. These algorithms were part of my work on PHD Astrophysics. 
